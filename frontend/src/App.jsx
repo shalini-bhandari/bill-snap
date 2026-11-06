@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import UploadSection from "./components/UploadSection";
 import RecentBills from "./components/RecentBills";
-import { getAllBills, saveBill } from "./db/billDB";
+import { getAllBills, saveBill, deleteBill } from "./db/billDB";
 import "./App.css";
 
 function App() {
@@ -44,6 +44,21 @@ function App() {
     }
   }
 
+  async function handleBillDeleted(billId) {
+    try {
+      await deleteBill(billId);
+
+      setBills((previousBills) =>
+        previousBills.filter((bill) => bill.id !== billId)
+      );
+
+      setStorageError("");
+    } catch (error) {
+      console.error("Unable to delete bill:", error);
+      setStorageError("Unable to delete this bill. Please try again.");
+    }
+  }
+
   return (
     <div className="app-container">
 
@@ -62,7 +77,10 @@ function App() {
         {loadingBills ? (
           <p>Loading your saved bills...</p>
         ) : (
-          <RecentBills bills={bills} />
+          <RecentBills 
+            bills={bills}
+            onBillDeleted={handleBillDeleted} 
+          />
         )}
 
       </main>

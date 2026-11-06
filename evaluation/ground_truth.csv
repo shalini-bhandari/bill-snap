@@ -1,0 +1,21 @@
+image_name,is_bill,merchant_name,bill_date,total_amount,category
+test-01.jpeg,TRUE,Curefoods (India) Pvt. Ltd. - Airport Quad,2026-11-06,395.0,Food
+test-02.jpeg,TRUE,Curefoods (India) Pvt. Ltd. - Airport Quad,2026-11-06,70.0,Food
+test-03.jpeg,TRUE,Talk Bar,2026-05-29,8843.0,Food
+test-04.jpg,TRUE,Chef Wang,2019-02-02,35.52,Food
+test-05.jpg,TRUE,Moonstar Restaurant,2018-10-29,37.37,Food
+test-06.jpg,TRUE,Deccan Spice,2019-07-26,47.02,Food
+test-07.jpg,TRUE,Hawwi Ethiopian Restaurant,2018-07-13,69.76,Food
+test-08.jpg,TRUE,Chris's Hamburgers,2018-07-22,51.02,Food
+test-09.jpg,TRUE,Lin Buffet,2019-02-24,33.73,Food
+test-10.jpg,TRUE,Surati Farsan Mart,2019-08-08,6.56,Food
+test-11.jpg,TRUE,Stanford's,2017-09-30,37.29,Food
+test-12.jpg,TRUE,El Charro Cafe Ventana,2018-06-24,47.9,Food
+test-13.jpg,TRUE,Via Mar Restaurant,2018-09-06,73.24,Food
+test-14.jpg,TRUE,Kobe Japanese Steak,2019-02-22,173.07,Food
+test-15.jpg,TRUE,Villaggio Grille,2019-06-08,34.12,Food
+test-nonbill-01.jpeg,FALSE,,,,
+test-nonbill-02.jpeg,FALSE,,,,
+test-nonbill-03.jpeg,FALSE,,,,
+test-nonbill-04.jpeg,FALSE,,,,
+test-nonbill-05.jpeg,FALSE,,,,

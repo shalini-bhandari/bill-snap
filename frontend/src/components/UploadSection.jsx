@@ -145,22 +145,20 @@ function UploadSection({ onBillSaved }) {
       created_at: new Date().toISOString(),
       image: selectedFile
     };
+
     try {
       setSaving(true);
       setError("");
 
       await onBillSaved(newBill);
+
       removeImage();
-    } catch(err) {
+    } catch (err) {
       console.error("Bill saving error:", err);
       setError(err.message || "Unable to save bill.");
     } finally {
       setSaving(false);
     }
-
-    onBillSaved(newBill);
-
-    removeImage();
   }
 
   // Remove the selected image and reset the form
@@ -404,7 +402,7 @@ function UploadSection({ onBillSaved }) {
                   <button
                     className="primary-button"
                     onClick={handleSaveBill}
-                    disable={saving}
+                    disabled={saving}
                   >
                     {saving ? "Saving..." : "Save bill"}
                   </button>
