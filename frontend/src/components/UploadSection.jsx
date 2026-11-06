@@ -13,6 +13,7 @@ function UploadSection({ onBillSaved }) {
   const [analysis, setAnalysis] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   // Create and clean up the temporary preview URL
   useEffect(() => {
@@ -81,7 +82,6 @@ function UploadSection({ onBillSaved }) {
         );
       }
 
-      // Keep editable form values as strings
       setAnalysis({
         ...data,
         merchant_name: data.merchant_name ?? "",
@@ -107,7 +107,6 @@ function UploadSection({ onBillSaved }) {
     }
   }
 
-  // Update an individual extracted field
   function handleFieldChange(field, value) {
     setAnalysis((previous) => ({
       ...previous,
@@ -116,8 +115,8 @@ function UploadSection({ onBillSaved }) {
   }
 
   // Save the reviewed bill
-  function handleSaveBill() {
-    if (!analysis) return;
+  async function handleSaveBill() {
+    if (!analysis || saving) return;
 
     if (
       !analysis.merchant_name.trim() ||
@@ -143,8 +142,21 @@ function UploadSection({ onBillSaved }) {
       bill_date: analysis.bill_date || null,
       total_amount: amount,
       category: analysis.category,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      image: selectedFile
     };
+    try {
+      setSaving(true);
+      setError("");
+
+      await onBillSaved(newBill);
+      removeImage();
+    } catch(err) {
+      console.error("Bill saving error:", err);
+      setError(err.message || "Unable to save bill.");
+    } finally {
+      setSaving(false);
+    }
 
     onBillSaved(newBill);
 
@@ -392,8 +404,9 @@ function UploadSection({ onBillSaved }) {
                   <button
                     className="primary-button"
                     onClick={handleSaveBill}
+                    disable={saving}
                   >
-                    Save bill
+                    {saving ? "Saving..." : "Save bill"}
                   </button>
 
                   <button
