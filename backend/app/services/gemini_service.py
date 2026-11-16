@@ -42,7 +42,8 @@ async def analyze_image_with_gemini(
 ) -> BillAnalysis:
 
     # Retry temporary Gemini server failures
-    for attempt in range(3):
+    max_attempts = 3
+    for attempt in range(max_attempts):
         try:
             response = await client.aio.models.generate_content(
                 model=settings.GEMINI_MODEL,
@@ -62,24 +63,32 @@ async def analyze_image_with_gemini(
                 )
             )
 
-            break
+            if response.parsed is not None:
+                return BillAnalysis.model_validated(response.parsed)
+            if response.text:
+                return BillAnalysis.model_validated_json(response.text)
+            raise ValueError("Gemini returned an empty response.")
 
+        except errors.ClientError as error:
+            if error.code == 429:
+                raise RuntimeError(
+                    "Gemini API quota or rate limit exceeded"
+                    "Please try again later."
+                ) from error
+            raise
         except errors.ServerError as error:
-            if error.code != 503 or attempt == 2:
+            if error.code not in (500, 502, 503, 504):
                 raise
 
-            delay = 2 ** attempt
+            if attempt == max_attempts - 1:
+                raise
+
+            delay = 2 ** (attempt + 1)
             print(
                 f"Gemini temporarily unavailable. "
                 f"Retrying in {delay} seconds..."
             )
 
             await asyncio.sleep(delay)
-
-    if response.parsed is not None:
-        return BillAnalysis.model_validate(response.parsed)
-
-    if response.text:
-        return BillAnalysis.model_validate_json(response.text)
 
     raise ValueError("Gemini returned an empty response.")

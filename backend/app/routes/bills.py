@@ -71,7 +71,18 @@ async def analyze_bill(file: UploadFile = File(...)):
             image_bytes=image_bytes,
             mime_type=mime_type
         )
-
+    except RuntimeError as error:
+        if "quota or rate limit exceeded" in str(error).lower():
+            raise HTTPException(
+                status_code=429,
+                detail=str(error)
+            )
+        logger.exception("Gemini analysis failed")
+        raise HTTPException(
+            status_code=502,
+            detail="Unable to analyze the image right now. Please try again."
+        )
+    
     except Exception:
         logger.exception("Gemini bill analysis failed")
 
