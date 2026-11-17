@@ -1,8 +1,8 @@
 import logging
 from io import BytesIO
-
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from PIL import Image, UnidentifiedImageError
+from app.services.image_service import preprocess_image
 
 from app.services.gemini_service import analyze_image_with_gemini
 
@@ -63,13 +63,17 @@ async def analyze_bill(file: UploadFile = File(...)):
             detail="The uploaded file is not a valid image."
         )
 
-    mime_type = ALLOWED_FORMATS[image_format]
-
     # 5. Send image to Gemini
     try:
+        processed_bytes, processed_mime_type = preprocess_image(image_bytes)
         result = await analyze_image_with_gemini(
-            image_bytes=image_bytes,
-            mime_type=mime_type
+            image_bytes = processed_bytes,
+            mime_type = processed_mime_type
+        )
+    except ValueError as error:
+        raise HTTPException(
+            status_code = 400,
+            detail = str(error)
         )
     except RuntimeError as error:
         if "quota or rate limit exceeded" in str(error).lower():
