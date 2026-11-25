@@ -3,7 +3,7 @@ from io import BytesIO
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from PIL import Image, UnidentifiedImageError
 from app.services.image_service import preprocess_image
-
+from app.services.quality_service import get_image_quality
 from app.services.gemini_service import analyze_image_with_gemini
 
 router = APIRouter(prefix="/api/bills", tags=["Bills"])
@@ -66,6 +66,7 @@ async def analyze_bill(file: UploadFile = File(...)):
     # 5. Send image to Gemini
     try:
         processed_bytes, processed_mime_type = preprocess_image(image_bytes)
+        quality_result = get_image_quality(processed_bytes)
         result = await analyze_image_with_gemini(
             image_bytes = processed_bytes,
             mime_type = processed_mime_type
@@ -95,5 +96,8 @@ async def analyze_bill(file: UploadFile = File(...)):
             detail="Unable to analyze the image right now. Please try again."
         )
 
-    return result.model_dump()
+    return {
+        **result.model_dump(),
+        "image_quality": quality_result
+    }
 
