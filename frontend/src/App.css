@@ -615,3 +615,22 @@
     font-size: 21px;
   }
 }
+
+.quality-warning {
+  background-color: #fff8e7;
+  border: 1px solid #f2d28b;
+  border-radius: 10px;
+  padding: 14px;
+  margin: 16px 0;
+  color: #795b16;
+}
+
+.quality-warning p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.quality-warning small {
+  font-size: 12px;
+  opacity: 0.8;
+}

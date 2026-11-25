@@ -82,6 +82,7 @@ function UploadSection({ onBillSaved }) {
         );
       }
 
+      console.log("Image quality:", data.image_quality);
       setAnalysis({
         ...data,
         merchant_name: data.merchant_name ?? "",
@@ -307,7 +308,24 @@ function UploadSection({ onBillSaved }) {
               <div className="analysis-result">
 
                 <h2>Bill detected!</h2>
+                {analysis.image_quality?.is_blurry && (
+                  <div className="quality-warning" role="alert">
+                    <strong>Image quality warning</strong>
 
+                    <p>
+                      {analysis.image_quality.quality_warning ||
+                        "This image may be blurry. Please check the receipt carefully."}
+                    </p>
+
+                    <small>
+                      Blur score: {analysis.image_quality.blur_score}
+                    </small>
+
+                    <p>
+                      You can still review and save this bill.
+                    </p>
+                  </div>
+                )}
                 <p className="upload-description">
                   Review the extracted details before saving.
                 </p>

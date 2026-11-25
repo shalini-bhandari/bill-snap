@@ -64,9 +64,9 @@ async def analyze_image_with_gemini(
             )
 
             if response.parsed is not None:
-                return BillAnalysis.model_validated(response.parsed)
+                return BillAnalysis.model_validate(response.parsed)
             if response.text:
-                return BillAnalysis.model_validated_json(response.text)
+                return BillAnalysis.model_validate_json(response.text)
             raise ValueError("Gemini returned an empty response.")
 
         except errors.ClientError as error:
