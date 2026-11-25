@@ -5,3 +5,6 @@ venv/
 dist/
 __pycache__/
 .DS_Store
+# Environment-specific configuration files
+.env.*
+!.env.example

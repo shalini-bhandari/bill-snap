@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.bills import router as bills_router
+from app.config import settings
 
 app = FastAPI(
     title="Bill Snap API",
@@ -8,12 +9,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-allowed_origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5174"
-]
+allowed_origins = settings.allowed_origins
 
 app.add_middleware(
     CORSMiddleware,
