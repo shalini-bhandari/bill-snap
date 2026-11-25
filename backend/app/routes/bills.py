@@ -1,10 +1,12 @@
 import logging
 from io import BytesIO
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request
 from PIL import Image, UnidentifiedImageError
 from app.services.image_service import preprocess_image
 from app.services.quality_service import get_image_quality
 from app.services.gemini_service import analyze_image_with_gemini
+from app.security import verify_beta_access
+from app.rate_limiter import limiter
 
 router = APIRouter(prefix="/api/bills", tags=["Bills"])
 logger = logging.getLogger(__name__)
@@ -18,8 +20,9 @@ ALLOWED_FORMATS = {
 }
 
 
-@router.post("/analyze")
-async def analyze_bill(file: UploadFile = File(...)):
+@router.post("/analyze", dependencies=[Depends(verify_beta_access)])
+@limiter.limit("5/minute")
+async def analyze_bill(request: Request, file: UploadFile = File(...)):
 
     #1. Check content type
     if file.content_type not in ALLOWED_FORMATS.values():

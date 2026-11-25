@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/bills/analyze`;
@@ -14,6 +13,28 @@ function UploadSection({ onBillSaved }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const [betaCode, setBetaCode] = useState(
+    () => sessionStorage.getItem("billSnapBetaCode") || ""
+  );
+
+  const [hasBetaAccess, setHasBetaAccess] = useState(
+    () => Boolean(sessionStorage.getItem("billSnapBetaCode"))
+  );
+
+  function handleBetaAccess(event) {
+    event.preventDefault();
+
+    if (!betaCode.trim()) {
+      setError("Please enter your beta access code.");
+      return;
+    }
+
+    sessionStorage.setItem("billSnapBetaCode", betaCode.trim());
+    setBetaCode(betaCode.trim());
+    setHasBetaAccess(true);
+    setError("");
+  }
 
   // Create and clean up the temporary preview URL
   useEffect(() => {
@@ -71,11 +92,22 @@ function UploadSection({ onBillSaved }) {
     try {
       const response = await fetch(API_URL, {
         method: "POST",
+        headers: {
+          "X-Beta-Code": sessionStorage.getItem("billSnapBetaCode") || "" || ""
+        },
         body: formData
       });
 
       const data = await response.json();
 
+      if (response.status === 401) {
+        sessionStorage.removeItem("billSnapBetaCode");
+        setHasBetaAccess(false);
+
+        throw new Error(
+          "Invalid beta acess code. Please enter the correct code."
+        );
+      }
       if (!response.ok) {
         throw new Error(
           data.detail || "Unable to analyze the image."
@@ -193,7 +225,36 @@ function UploadSection({ onBillSaved }) {
 
   return (
     <section className="upload-section">
+      {!hasBetaAccess ? (
+    <div className="upload-card">
+      <h2>Welcome to Bill Snap Beta</h2>
 
+      <p className="upload-description">
+        Enter your beta access code to continue.
+      </p>
+
+      <form onSubmit={handleBetaAccess}>
+        <input
+          type="password"
+          placeholder="Enter beta access code"
+          value={betaCode}
+          onChange={(event) => setBetaCode(event.target.value)}
+          autoComplete="off"
+        />
+
+        <button type="submit" className="primary-button">
+          Continue
+        </button>
+      </form>
+
+      {error && (
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  ) : (
+    <>
       <div className="section-heading">
         <div>
           <p className="eyebrow">GET STARTED</p>
@@ -475,7 +536,8 @@ function UploadSection({ onBillSaved }) {
         hidden
         onChange={handleImageChange}
       />
-
+    </>
+  )}
     </section>
   );
 }
